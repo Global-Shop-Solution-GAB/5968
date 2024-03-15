@@ -1,0 +1,281 @@
+Program.Sub.ScreenSU.Start
+Gui.Form..Create
+Gui.Form..Size(6075,4605)
+Gui.Form..MinX(0)
+Gui.Form..MinY(0)
+Gui.Form..Position(0,0)
+Gui.Form..BackColor(-2147483633)
+Gui.Form..MousePointer(0)
+Gui.Form..Caption("Copy to EDE")
+Gui.Form..Event(UnLoad,Unload)
+Gui.Form.txt_Part.Create(TextBox,"",True,2760,300,0,705,600,False,0,"Arial",8,-2147483643,1)
+Gui.Form.txt_Rev.Create(TextBox,"",True,615,300,0,3600,600,False,0,"Arial",8,-2147483643,1)
+Gui.Form.txt_Loc.Create(TextBox,"",True,660,300,0,4290,600,False,0,"Arial",8,-2147483643,1)
+Gui.Form.lbl_Part.Create(Label,"Part",True,1935,255,0,660,375,True,0,"Arial",8,-2147483633,0)
+Gui.Form.lbl_Rev.Create(Label,"Rev",True,525,255,0,3555,375,True,0,"Arial",8,-2147483633,0)
+Gui.Form.lbl_Loc.Create(Label,"Loc",True,510,255,0,4245,375,True,0,"Arial",8,-2147483633,0)
+Gui.Form.cmd_Process.Create(Button)
+Gui.Form.cmd_Process.Size(990,375)
+Gui.Form.cmd_Process.Position(3375,3375)
+Gui.Form.cmd_Process.Caption("Process")
+Gui.Form.cmd_Process.Event(Click,cmd_Process)
+Gui.Form.frame_Formula.Create(Frame)
+Gui.Form.frame_Formula.Size(5475,960)
+Gui.Form.frame_Formula.Position(165,2205)
+Gui.Form.txt_PriceOrig.Create(TextBox,"",True,1245,300,0,90,540,False,1,"Arial",8,-2147483643,1)
+Gui.Form.txt_PriceOrig.Parent("frame_Formula")
+Gui.Form.lbl_Multiply1.Create(Label,"*",True,210,255,0,1425,660,True,0,"Arial",8,-2147483633,0)
+Gui.Form.lbl_Multiply1.Parent("frame_Formula")
+Gui.Form.txt_Discount.Create(TextBox,"0.80",True,555,300,0,1665,540,True,2,"Arial",8,-2147483643,1)
+Gui.Form.txt_Discount.Parent("frame_Formula")
+Gui.Form.txt_Discount.DefaultValue("0.80")
+Gui.Form.lbl_Multiply2.Create(Label,"*",True,210,255,0,2280,660,True,0,"Arial",8,-2147483633,0)
+Gui.Form.lbl_Multiply2.Parent("frame_Formula")
+Gui.Form.txt_Conversion.Create(TextBox,"0.92",True,555,300,0,2505,540,True,2,"Arial",8,-2147483643,1)
+Gui.Form.txt_Conversion.Parent("frame_Formula")
+Gui.Form.txt_Conversion.DefaultValue("0.92")
+Gui.Form.lbl_Multiply3.Create(Label,"*",True,210,255,0,3120,660,True,0,"Arial",8,-2147483633,0)
+Gui.Form.lbl_Multiply3.Parent("frame_Formula")
+Gui.Form.txt_Markup.Create(TextBox,"1.5",True,555,300,0,3330,540,True,2,"Arial",8,-2147483643,1)
+Gui.Form.txt_Markup.Parent("frame_Formula")
+Gui.Form.txt_Markup.DefaultValue("1.5")
+Gui.Form.lbl_Equals.Create(Label,"=",True,210,255,0,3915,630,True,0,"Arial",8,-2147483633,0)
+Gui.Form.lbl_Equals.Parent("frame_Formula")
+Gui.Form.txt_PriceNew.Create(TextBox,"",True,1215,300,0,4170,540,True,1,"Arial",8,-2147483643,1)
+Gui.Form.txt_PriceNew.Parent("frame_Formula")
+Gui.Form.txt_PriceNew.Mask("0.#####")
+Gui.Form.lbl_PriceOrig.Create(Label,"Current Price $",True,1290,255,0,45,315,True,0,"Arial",8,-2147483633,0)
+Gui.Form.lbl_PriceOrig.Parent("frame_Formula")
+Gui.Form.lbl_Discount.Create(Label,"Disc",True,570,255,0,1620,315,True,0,"Arial",8,-2147483633,0)
+Gui.Form.lbl_Discount.Parent("frame_Formula")
+Gui.Form.lbl_Conversion.Create(Label,"Conv",True,555,255,0,2460,315,True,0,"Arial",8,-2147483633,0)
+Gui.Form.lbl_Conversion.Parent("frame_Formula")
+Gui.Form.lbl_PriceNew.Create(Label,"New Price Euros",True,1305,255,0,4125,315,True,0,"Arial",8,-2147483633,0)
+Gui.Form.lbl_PriceNew.Parent("frame_Formula")
+Gui.Form.lbl_Markup.Create(Label,"MarkUp",True,750,255,0,3285,315,True,0,"Arial",8,-2147483633,0)
+Gui.Form.lbl_Markup.Parent("frame_Formula")
+Gui.Form.txt_Desc.Create(TextBox,"",True,2760,300,0,705,1350,False,0,"Arial",8,-2147483643,1)
+Gui.Form.lbl_Desc.Create(Label,"Description",True,1935,255,0,660,1125,True,0,"Arial",8,-2147483633,0)
+Gui.Form.cmd_Calc.Create(Button)
+Gui.Form.cmd_Calc.Size(990,375)
+Gui.Form.cmd_Calc.Position(1665,3375)
+Gui.Form.cmd_Calc.Caption("Calculate")
+Gui.Form.cmd_Calc.Event(Click,cmd_Calculate)
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+	v.Global.sGSSPart.Declare
+	v.Global.sLoc.Declare
+	V.Global.sPL.Declare
+	V.Global.sDesc.Declare
+	V.Global.sUM.Declare
+	V.Global.sText1.Declare
+	V.Global.sText2.Declare
+	V.Global.sDesc2.Declare(String,"")
+	V.Global.sDesc3.Declare(String,"")
+	V.Global.sSource.Declare
+	V.Global.sLBS.Declare
+	V.Global.sShelf.Declare
+	V.Global.sHaz.Declare
+	V.Global.sNoDisc.Declare
+	V.Global.sNotes.Declare
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+F.Intrinsic.Control.Try
+V.Local.sError.Declare
+		
+		V.Local.sSQL.Declare
+		V.Local.bTable.Declare
+		V.Local.fPriceOrig.Declare
+		V.Local.fPriceNew.Declare
+		V.Local.sPart.Declare
+		V.Local.sRev.Declare
+			V.Local.sDSN.Declare
+			V.Local.sRet.Declare
+			V.Local.sPriceNew.Declare
+			V.Local.sCompany.Declare
+			V.Local.iCount.Declare
+			V.Local.sData.Declare
+			V.Local.sPath.Declare
+			V.Local.sFileName.Declare
+			V.Local.sFileName2.Declare
+			V.Local.sFileName3.Declare
+			V.Local.sFileName4.Declare
+			V.Local.sInv2.Declare
+			V.Local.sInv3.Declare
+			V.Local.sNotes.Declare
+			V.Local.bNotes.Declare(Boolean,False)
+		
+		'Get part and loc
+		F.Intrinsic.String.GSSPartString(V.Passed.PART,V.Passed.REV,V.Global.sGSSPart)
+	
+		V.Local.sSQL.Set("Select Left(T1.PART,17) as PART, Right(T1.PART,3) as REV, T1.LOCATION, T1.PRODUCT_LINE, T1.DESCRIPTION, T1.UM_INVENTORY, T1.AMT_PRICE, T1.TEXT_INFO1, T1.TEXT_INFO2, T1.CODE_SOURCE, T1.LBS, T1.SHELF_LIFE, T1.HM_FLAG, T1.NO_DISC, T2.SALES_DESC From V_INVENTORY_ALL T1 LEFT JOIN GCG_Addl_Notes_Elnik T2 on T1.PART = T2.PART Where LEFT(T1.PART,2) >= '11' AND LEFT(T1.PART,2) <= '19';")
+		
+		F.ODBC.Connection!con.OpenConnection(V.Ambient.PDSN,V.Ambient.PUser,V.Ambient.PPass)
+	
+		'Get Part information
+		F.ODBC.Connection!con.OpenLocalRecordsetRO("rst",V.Local.sSQL)
+		
+		F.Intrinsic.Control.If(V.ODBC.con!rst.EOF,=,False)
+		
+			F.Intrinsic.Control.DoUntil(V.ODBC.con!rst.EOF,=,True)
+				
+				V.Local.sPart.Set(V.ODBC.con!rst.FieldValTrim!PART)					'PART
+				V.Local.sRev.Set(V.ODBC.con!rst.FieldValTrim!REV) 					'REV
+				F.Intrinsic.String.GSSPartString(V.Local.sPart,V.Local.sRev,V.Global.sGSSPart)
+				V.Global.sLoc.Set(V.ODBC.con!rst.FieldValTrim!LOCATION)				'LOC
+				V.Global.sDesc.Set(V.ODBC.con!rst.FieldValTrim!DESCRIPTION)			'DESCRIPTION
+'				Gui.Form.txt_PriceOrig.Text(V.ODBC.con!rst.FieldValTrim!AMT_PRICE)	'AMT_PRICE
+				V.Global.sPL.Set(V.ODBC.con!rst.FieldValTrim!PRODUCT_LINE)			'PRODUCT_LINE
+				V.Global.sUM.Set(V.ODBC.con!rst.FieldValTrim!UM_INVENTORY)			'UM_INVENTORY
+				V.Global.sText1.Set(V.ODBC.con!rst.FieldValTrim!TEXT_INFO1)			'TEXT_INFO1
+				V.Global.sText2.Set(V.ODBC.con!rst.FieldValTrim!TEXT_INFO2)			'TEXT_INFO2
+	'			V.Global.sDesc2.Set(V.ODBC.con!rst.FieldValTrim!DESCRIPTION_2)		'DESCRIPTION_2
+	'			V.Global.sDesc3.Set(V.ODBC.con!rst.FieldValTrim!DESCRIPTION_3)		'DESCRIPTION_3
+				V.Global.sSource.Set(V.ODBC.con!rst.FieldValTrim!CODE_SOURCE)		'CODE_SOURCE
+				V.Global.sLBS.Set(V.ODBC.con!rst.FieldValTrim!LBS)					'LBS
+				V.Global.sShelf.Set(V.ODBC.con!rst.FieldValTrim!SHELF_LIFE)			'SHELF_LIFE
+				V.Global.sHaz.Set(V.ODBC.con!rst.FieldValTrim!HM_FLAG)				'HM_FLAG
+				V.Global.sNoDisc.Set(V.ODBC.con!rst.FieldValTrim!NO_DISC)			'NO_DISC
+				v.Global.sNotes.Set(V.ODBC.con!rst.FieldValTrim!SALES_DESC)			'SALES_DESC
+				V.Local.fPriceOrig.Set(V.ODBC.con!rst.FieldValTrim!AMT_PRICE)
+				
+				V.Local.sPriceNew.Set("0")
+				F.Intrinsic.Math.Mult(V.Local.fPriceOrig,"0.80","0.92","1.5",V.Local.sPriceNew)
+				
+	'**************
+				V.Global.sSource.Set("P") 		'Set all to source of Purch to Stock
+				V.Global.sDesc2.Set("")			'Clear all Alt Desc 2
+				V.Global.sDesc3.Set("")			'Clear all Alt Desc 3
+				'V.Local.sPriceNew.Set(V.Screen.Form!txt_PriceNew.Caption)
+				
+				'replace "/" with "#$#"
+				F.Intrinsic.String.Replace(V.Global.sGSSPart,"/","#$#",V.Global.sGSSPart)
+				
+				'Create new part. - part, unit of measure, description, location, product line, source code, alt description 1, alt description 2, price, calling program
+			'	V.Global.sGSSPart.Set(V.Global.sGSSPart.Trim,V.Global.sGSSPart)
+			'	V.Local.sData.Set(V.Local.sRet)
+				F.Intrinsic.String.Build("{0}*!*{1}*!*{2}*!*{3}*!*{4}*!*{5}*!*{6}*!*{7}*!*{8}*!*{9}*!*{10}*!*{11}*!*{12}*!*{13}*!*{14}*!*{15}",V.Global.sGSSPart.Trim,V.Global.sUM.Trim,V.Global.sDesc.Trim,V.Global.sLoc.Trim,V.Global.sPL.Trim,V.Global.sSource.Trim,V.Global.sDesc2.Trim,V.Global.sDesc3.Trim,V.Local.sPriceNew,V.Global.sText1.Trim,V.Global.sText2.Trim,V.Global.sLBS.Trim,V.Global.sShelf,V.Global.sHaz,V.Global.sNoDisc,V.Global.sNotes.Trim,V.Local.sRet)
+				
+				'Build basic file path
+				F.Intrinsic.String.Build("{0}\INTERINV\EDE",V.Caller.FilesDir,V.Local.sPath)
+
+					F.Intrinsic.Control.If(V.Local.sRet.Trim,<>,V.Global.sGSSPart)
+				'		F.Intrinsic.String.Split(V.Local.sCompany(V.Local.iCount),"*!*",V.Local.sPath)
+						F.Intrinsic.String.Build("{0}\{1}.txt",V.Local.sPath,V.Global.sGSSPart.Trim,V.Local.sFileName)		
+						F.Intrinsic.File.String2File(V.Local.sFileName,V.Local.sRet)
+					F.Intrinsic.Control.EndIf
+		
+				F.ODBC.con!rst.MoveNext
+				F.Intrinsic.Control.Loop	
+			
+			F.Intrinsic.Control.Else
+				F.Intrinsic.UI.Msgbox("No Part Number")
+				F.ODBC.Connection!con.Close
+				F.Intrinsic.Control.End
+			F.Intrinsic.Control.EndIf
+		
+		F.ODBC.con!rst.Close
+		
+	F.Intrinsic.Control.CallSub(Unload)			
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.End 
+F.Intrinsic.Control.EndTry
+Program.Sub.Main.End
+
+Program.Sub.cmd_Process.Start
+F.Intrinsic.Control.Try
+V.Local.sError.Declare
+
+	'Create new part. - part, unit of measure, description, location, product line, source code, alt description 1, alt description 2, price, calling program
+	
+'************
+'V.Local.sRet.Declare
+V.Local.sCompany.Declare
+V.Local.iCount.Declare
+V.Local.sData.Declare
+V.Local.sPath.Declare
+V.Local.sFileName.Declare
+V.Local.sFileName2.Declare
+V.Local.sFileName3.Declare
+V.Local.sFileName4.Declare
+V.Local.sInv2.Declare
+V.Local.sInv3.Declare
+V.Local.sNotes.Declare
+V.Local.bNotes.Declare(Boolean,False)
+
+	V.Global.sSource.Set("P") 		'Set all to source of Purch to Stock
+	V.Global.sDesc2.Set("")			'Clear all Alt Desc 2
+	V.Global.sDesc3.Set("")			'Clear all Alt Desc 3
+	V.Local.sPriceNew.Set(V.Screen.Form!txt_PriceNew.Caption)
+	
+	'Create new part. - part, unit of measure, description, location, product line, source code, alt description 1, alt description 2, price, calling program
+	
+			'	V.Local.sData.Set(V.Local.sRet)
+				F.Intrinsic.String.Build("{0}*!*{1}*!*{2}*!*{3}*!*{4}*!*{5}*!*{6}*!*{7}*!*{8}*!*{9}*!*{10}*!*{11}*!*{12}*!*{13}*!*{14}*!*{15}",V.Global.sGSSPart.Trim,V.Global.sUM.Trim,V.Global.sDesc.Trim,V.Global.sLoc.Trim,V.Global.sPL.Trim,V.Global.sSource.Trim,V.Global.sDesc2.Trim,V.Global.sDesc3.Trim,V.Local.sPriceNew,V.Global.sText1.Trim,V.Global.sText2.Trim,V.Global.sLBS.Trim,V.Global.sShelf,V.Global.sHaz,V.Global.sNoDisc,V.Global.sNotes.Trim,V.Local.sRet)
+				
+				'Build basic file path
+				F.Intrinsic.String.Build("{0}\INTERINV\EDE",V.Caller.FilesDir,V.Local.sPath)
+
+					F.Intrinsic.Control.If(V.Local.sRet.Trim,<>,V.Global.sGSSPart)
+				'		F.Intrinsic.String.Split(V.Local.sCompany(V.Local.iCount),"*!*",V.Local.sPath)
+						F.Intrinsic.String.Build("{0}\{1}.txt",V.Local.sPath,V.Global.sGSSPart.Trim,V.Local.sFileName)		
+						F.Intrinsic.File.String2File(V.Local.sFileName,V.Local.sRet)
+					F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.End 
+F.Intrinsic.Control.EndTry
+Program.Sub.cmd_Process.End
+
+Program.Sub.cmd_Calculate.Start
+F.Intrinsic.Control.Try
+V.Local.sError.Declare
+
+	V.Local.fPriceOrig.Declare(Float)
+	V.Local.fDiscount.Declare(Float)
+	V.Local.fConvert.Declare(Float)
+	V.Local.fMarkUp.Declare(Float)
+	V.Local.fPriceNew.Declare(Float,5)
+	
+	V.Local.fPriceOrig.Set(V.Screen.Form!txt_PriceOrig.Caption)
+	V.Local.fDiscount.Set(V.Screen.Form!txt_Discount.Caption)
+	V.Local.fConvert.Set(V.Screen.Form!txt_Conversion.Caption)
+	V.Local.fMarkUp.Set(V.Screen.Form!txt_Markup.Caption)
+	V.Local.fPriceNew.Set("")
+	
+	Gui.Form.txt_PriceNew.Text("")
+	
+	F.Intrinsic.Math.Mult(V.Local.fPriceOrig,V.Local.fDiscount,V.Local.fConvert,V.Local.fMarkUp,V.Local.fPriceNew)
+	
+	Gui.Form.txt_PriceNew.Text(V.Local.fPriceNew)
+	
+	F.Intrinsic.Control.ExitSub
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.End 
+F.Intrinsic.Control.EndTry
+Program.Sub.cmd_Calculate.End
+
+Program.Sub.Unload.Start
+F.Intrinsic.Control.Try
+V.Local.sError.Declare
+
+	F.ODBC.Connection!con.Close
+	Gui.Form..Show(False)
+	F.Intrinsic.Control.End
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.End 
+F.Intrinsic.Control.EndTry
+Program.Sub.Unload.End
