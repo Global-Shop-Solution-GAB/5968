@@ -1,0 +1,147 @@
+Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+F.Intrinsic.Control.Try
+V.Local.sError.Declare
+
+'************ Programed by Andrew D 5/6/2020
+' This program will pick up the txt file in the \Global\FILES\INTERINV\EDE folder named by the part number and create/update the passed part information.
+
+f.Intrinsic.Control.CallSub(get_files)
+
+f.Intrinsic.Control.CallSub(create_parts,"FILES",V.Args.FILES)
+
+F.Intrinsic.Control.End
+
+f.Intrinsic.Control.catch
+f.Intrinsic.Control.CallSub(catching,"sub",v.Ambient.CurrentSubroutine,"errorno",v.Ambient.ErrorNumber,"errordesc",v.Ambient.ErrorDescription)
+f.Intrinsic.Control.EndTry
+Program.Sub.Main.End
+
+Program.Sub.Catching.Start
+v.Local.sError.declare(string)
+F.Intrinsic.String.Build("Project: {0}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}","GCG_5653_PART_UPLOAD.g2u",V.Ambient.NewLine,v.Args.sub,V.Args.errorno,V.args.errordesc,V.Local.sError)
+f.Intrinsic.UI.Msgbox(v.Local.sError)
+F.Intrinsic.Control.CallSub(UNLOAD)
+Program.Sub.Catching.End
+
+Program.Sub.unload.Start
+f.Intrinsic.Control.End
+Program.Sub.unload.End
+
+Program.Sub.get_files.Start
+F.Intrinsic.Control.Try
+V.Local.sError.Declare
+v.Local.sDir.Declare
+v.Local.sFileList.Declare
+
+'Inventory Create file
+F.Intrinsic.String.Build("{0}\INTERINV\{1}\",V.Caller.FilesDir,V.Caller.CompanyCode,V.Local.sDir)
+F.Intrinsic.File.GetFileList(V.Local.sDir,V.Local.sFileList)
+'Check if files exist
+F.Intrinsic.Control.If(V.Local.sFileList.IsNotNullOrWhiteSpace)
+	F.Intrinsic.Variable.AddRV("FILES",V.Local.sFileList)
+F.Intrinsic.Control.Else
+	F.Intrinsic.Control.End
+F.Intrinsic.Control.EndIf
+
+V.Local.sFileList.Set("")
+
+F.Intrinsic.Control.ExitSub
+
+f.Intrinsic.Control.catch
+f.Intrinsic.Control.CallSub(catching,"sub",v.Ambient.CurrentSubroutine,"errorno",v.Ambient.ErrorNumber,"errordesc",v.Ambient.ErrorDescription)
+f.Intrinsic.Control.EndTry
+Program.Sub.get_files.End
+
+Program.Sub.create_parts.Start
+F.Intrinsic.Control.Try
+V.Local.sError.Declare
+	v.Local.sFiles.Declare
+	v.Local.sFile.Declare
+	v.Local.sPart.Declare
+	V.Local.iCount.Declare
+	v.Local.sSQL.Declare
+	v.Local.sRet.Declare
+	V.Local.sFilePath.Declare
+	V.Local.sGSSPart.Declare
+	V.Local.sShelf.Declare
+	V.Local.sHaz.Declare
+	V.Local.sDiscount.Declare
+	
+	F.Intrinsic.String.Trim(V.Local.sPart(12),V.Local.sShelf)
+	F.Intrinsic.String.Trim(V.Local.sPart(13),V.Local.sHaz)
+	F.Intrinsic.String.Trim(V.Local.sPart(14),V.Local.sDiscount)
+	
+	'(0)	sGSSPart
+	'(1)	sUM
+	'(2)	sDesc
+	'(3)	sLoc
+	'(4)	sPL
+	'(5)	sSource
+	'(6)	sDesc2
+	'(7)	sDesc3
+	'(8)	sPriceNew
+	'(9)	sText1
+	'(10)	sText2
+	'(11)	sLBS.Trim
+	'(12)	sShelf
+	'(13)	sHaz
+	'(14)	sNoDisc
+	'(15)	sNotes
+	
+	F.ODBC.Connection!coredb.opencompanyconnection
+	
+	F.Intrinsic.String.Split(V.Args.FILES,":",V.Local.sFiles)
+	F.Intrinsic.Control.For(v.Local.iCount,0,v.Local.sFiles.UBound,1)
+		F.Intrinsic.String.Build("{0}\INTERINV\{1}\{2}",V.Caller.FilesDir,V.Caller.CompanyCode,v.Local.sFiles(v.Local.iCount),v.Local.sFile)
+		F.Intrinsic.File.File2String(v.Local.sFile,v.local.sPart)
+		F.Intrinsic.String.Split(v.Local.sPart,"*!*",v.Local.sPart)
+			F.Intrinsic.String.Replace(V.Local.sPart(0),"#$#","/",V.Local.sGSSPart)
+			'check to make sure the part hasn't been created by some other means (po/so upload perhaps)
+			F.Intrinsic.String.Build("Select PART From V_INVENTORY_MSTR Where PART = '{0}' and LOCATION = '{1}';",V.Local.sGSSPart.Trim,v.Local.sPart(3).Trim,v.Local.sSql)
+			F.ODBC.Connection!coredb.ExecuteAndReturn(V.Local.sSql,V.Local.sRet)
+			F.Intrinsic.Control.If(v.Local.sRet.IsNullOrWhiteSpace)
+				'Create new part. - part, unit of measure, description, location, product line, source code, alt description 1, alt description 2, price, calling program
+				F.Global.Inventory.CreatePart(V.Local.sGSSPart.trim,v.Local.sPart(1),v.Local.sPart(2).PSQLFriendly,v.Local.sPart(3),v.Local.sPart(4),v.Local.sPart(5),v.Local.sPart(6),v.Local.sPart(7),v.Local.sPart(8),"UPLOADED")
+				'Update inv mst2 records
+				F.Intrinsic.String.Build("Update INVENTORY_MST2 Set TEXT_INFO1='{0}', TEXT_INFO2='{1}', LBS='{2}' Where PART ='{3}' AND LOCATION = '{4}';",v.Local.sPart(9),v.Local.sPart(10),v.Local.sPart(11),V.Local.sGSSPart,v.Local.sPart(3),V.Local.sSQL)
+				F.ODBC.Connection!coredb.Execute(V.Local.sSQL)
+				'Update inv mst3 records
+				F.Intrinsic.String.Build("Update INVENTORY_MST3 Set SHELF_LIFE='{0}', HM_FLAG='{1}', NO_DISC='{2}' Where PART ='{3}' AND LOCATION = '{4}';",v.Local.sShelf,v.Local.sHaz,v.Local.sDiscount,V.Local.sGSSPart,v.Local.sPart(3),V.Local.sSQL)
+				F.ODBC.Connection!coredb.Execute(V.Local.sSQL)
+			F.Intrinsic.Control.Else
+				'Update Inventory Mstr
+				F.Intrinsic.String.Build("Update INVENTORY_MSTR Set PRODUCT_LINE='{0}', DESCRIPTION='{1}', UM_INVENTORY='{2}', AMT_PRICE='{3}' Where PART='{4}' AND LOCATION='{5}';",V.Local.sPart(4),V.Local.sPart(2).PSQLFriendly,V.Local.sPart(1),V.Local.sPart(8),V.Local.sGSSPart,V.Local.sPart(3),V.Local.sSQL)
+				F.ODBC.Connection!coredb.Execute(V.Local.sSQL)
+				'Update inv mst2 records
+				F.Intrinsic.String.Build("Update INVENTORY_MST2 Set TEXT_INFO1='{0}', TEXT_INFO2='{1}', LBS='{2}' Where PART ='{3}' AND LOCATION = '{4}';",v.Local.sPart(9),v.Local.sPart(10),v.Local.sPart(11),V.Local.sGSSPart,v.Local.sPart(3),V.Local.sSQL)
+				F.ODBC.Connection!coredb.Execute(V.Local.sSQL)
+				'Update inv mst3 records
+				F.Intrinsic.String.Build("Update INVENTORY_MST3 Set SHELF_LIFE='{0}', HM_FLAG='{1}', NO_DISC='{2}' Where PART ='{3}' AND LOCATION = '{4}';",v.Local.sShelf,v.Local.sHaz,v.Local.sDiscount,V.Local.sGSSPart,v.Local.sPart(3),V.Local.sSQL)
+				F.ODBC.Connection!coredb.Execute(V.Local.sSQL)			
+			F.Intrinsic.Control.EndIf
+			
+			'Notes
+			F.Intrinsic.String.Build("Select PART From GCG_Addl_Notes_Elnik Where PART = '{0}';",V.Local.sGSSPart.Trim,v.Local.sSql)
+			F.ODBC.Connection!coredb.ExecuteAndReturn(V.Local.sSql,V.Local.sRet)
+			F.Intrinsic.Control.If(v.Local.sRet.IsNullOrWhiteSpace)
+				F.Intrinsic.String.Build("Insert Into GCG_Addl_Notes_Elnik (PART, PURCHASE_DESC, SALES_DESC) Values ('{0}','{1}','{2}');",V.Local.sGSSPart.trim,V.Local.sPart(15).PSQLFriendly,V.Local.sPart(15).PSQLFriendly,V.Local.sSQL)
+			F.Intrinsic.Control.Else
+				F.Intrinsic.String.Build("Update GCG_Addl_Notes_Elnik Set PURCHASE_DESC='{0}', SALES_DESC='{1}' Where PART='{2}';",V.Local.sPart(15).PSQLFriendly,V.Local.sPart(15).PSQLFriendly,V.Local.sGSSPart.trim,V.Local.sSQL)
+			F.Intrinsic.Control.EndIf
+			F.ODBC.Connection!coredb.Execute(V.Local.sSQL)	
+			
+			F.Intrinsic.String.Build("{0}\INTERINV\{1}\{2}",V.Caller.FilesDir,V.Caller.CompanyCode,v.Local.sFiles(v.Local.iCount),V.Local.sFilePath)
+			F.Intrinsic.File.DeleteFile(V.Local.sFilePath)
+			F.Intrinsic.Control.Next(v.Local.iCount)
+			
+	F.ODBC.Connection!coredb.close
+	
+	F.Intrinsic.Control.ExitSub
+
+f.Intrinsic.Control.catch
+f.Intrinsic.Control.CallSub(catching,"sub",v.Ambient.CurrentSubroutine,"errorno",v.Ambient.ErrorNumber,"errordesc",v.Ambient.ErrorDescription)
+f.Intrinsic.Control.EndTry
+Program.Sub.create_parts.End
